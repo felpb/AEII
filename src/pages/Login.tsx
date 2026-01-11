@@ -51,7 +51,7 @@ export default function Login() {
           <div className="mx-auto w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
             <Package className="h-6 w-6 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Sistema de Gestão</CardTitle>
+          <CardTitle className="text-2xl">GestãoTech</CardTitle>
           <CardDescription>
             Entre com suas credenciais para acessar o sistema
           </CardDescription>
@@ -84,12 +84,7 @@ export default function Login() {
               {isLoading ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
-          
-          <div className="mt-6 p-4 bg-muted rounded-lg">
-            <p className="text-sm text-muted-foreground text-center">
-              <strong>Demo:</strong> Use <code className="bg-background px-1 rounded">admin@sistema.com</code> com qualquer senha
-            </p>
-          </div>
+
         </CardContent>
       </Card>
     </div>
