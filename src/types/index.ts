@@ -40,6 +40,7 @@ export interface Sale {
   total: number;
   userId: string;
   userName: string;
+  saleDate: string;
   createdAt: string;
 }
 

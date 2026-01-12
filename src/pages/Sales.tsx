@@ -26,9 +26,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Plus, Trash2, ShoppingCart } from 'lucide-react';
+import { Plus, Trash2, ShoppingCart, Calendar } from 'lucide-react';
 import { Product, Sale, SaleItem } from '@/types';
-import { getProducts, getSales, createSale } from '@/lib/storage';
+import { getProducts, getSales, createSale, getSaleDate } from '@/lib/storage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -39,6 +39,7 @@ export default function Sales() {
   const [saleItems, setSaleItems] = useState<SaleItem[]>([]);
   const [selectedProduct, setSelectedProduct] = useState('');
   const [quantity, setQuantity] = useState('1');
+  const [saleDate, setSaleDate] = useState(new Date().toISOString().split('T')[0]);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -49,7 +50,7 @@ export default function Sales() {
   const loadData = () => {
     setProducts(getProducts());
     setSales(getSales().sort((a, b) =>
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      new Date(getSaleDate(b)).getTime() - new Date(getSaleDate(a)).getTime()
     ));
   };
 
@@ -127,10 +128,12 @@ export default function Sales() {
       total,
       userId: user?.id || '',
       userName: user?.name || '',
+      saleDate: new Date(saleDate + 'T12:00:00').toISOString(),
     });
 
     toast({ title: 'Venda realizada com sucesso!' });
     setSaleItems([]);
+    setSaleDate(new Date().toISOString().split('T')[0]);
     setIsDialogOpen(false);
     loadData();
   };
@@ -161,6 +164,18 @@ export default function Sales() {
                 <DialogTitle>Nova Venda</DialogTitle>
               </DialogHeader>
               <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Data da Venda
+                  </Label>
+                  <Input
+                    type="date"
+                    value={saleDate}
+                    onChange={(e) => setSaleDate(e.target.value)}
+                    className="w-full sm:w-48"
+                  />
+                </div>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1 space-y-2">
                     <Label>Produto</Label>
@@ -274,12 +289,10 @@ export default function Sales() {
                   sales.map((sale) => (
                     <TableRow key={sale.id}>
                       <TableCell>
-                        {new Date(sale.createdAt).toLocaleDateString('pt-BR', {
+                        {new Date(getSaleDate(sale)).toLocaleDateString('pt-BR', {
                           day: '2-digit',
                           month: '2-digit',
                           year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
                         })}
                       </TableCell>
                       <TableCell>

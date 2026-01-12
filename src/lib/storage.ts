@@ -25,10 +25,12 @@ function setItem<T>(key: string, value: T): void {
 function initializeDefaultData(): void {
   if (!localStorage.getItem(STORAGE_KEYS.categories)) {
     const defaultCategories: Category[] = [
-      { id: '1', name: 'Eletrônicos' },
-      { id: '2', name: 'Roupas' },
-      { id: '3', name: 'Alimentos' },
-      { id: '4', name: 'Bebidas' },
+      { id: '1', name: 'Lubrificantes' },
+      { id: '2', name: 'Filtros' },
+      { id: '3', name: 'Elétrica' },
+      { id: '4', name: 'Motor' },
+      { id: '5', name: 'Pneus' },
+      { id: '6', name: 'Químicos' },
       { id: '5', name: 'Outros' },
     ];
     setItem(STORAGE_KEYS.categories, defaultCategories);
@@ -218,7 +220,7 @@ export function getDashboardMetrics(): {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const monthlySales = sales.filter(s => new Date(s.createdAt) >= startOfMonth);
+  const monthlySales = sales.filter(s => new Date(getSaleDate(s)) >= startOfMonth);
 
   const totalRevenue = monthlySales.reduce((acc, s) => acc + s.total, 0);
 
@@ -254,7 +256,7 @@ export function getRevenueData(days: number = 7): { date: string; revenue: numbe
     const dateStr = date.toISOString().split('T')[0];
 
     const dayRevenue = sales
-      .filter(s => s.createdAt.startsWith(dateStr))
+      .filter(s => getSaleDate(s).startsWith(dateStr))
       .reduce((acc, s) => acc + s.total, 0);
 
     result.push({
@@ -264,6 +266,10 @@ export function getRevenueData(days: number = 7): { date: string; revenue: numbe
   }
 
   return result;
+}
+
+export function getSaleDate(sale: Sale): string {
+  return sale.saleDate || sale.createdAt;
 }
 
 export function getRecentTransactions(limit: number = 10): Array<{
@@ -278,7 +284,7 @@ export function getRecentTransactions(limit: number = 10): Array<{
     type: 'sale' as const,
     description: `Venda - ${s.items.length} item(s)`,
     value: s.total,
-    date: s.createdAt,
+    date: getSaleDate(s),
   }));
 
   const purchases = getPurchases().map(p => ({
